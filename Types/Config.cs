@@ -1,26 +1,30 @@
-public enum AppType { Console, Rest, Gui };
-
-class Config
+namespace Types
 {
-    public AppType appType { get; private set; }
+    public enum AppType { Console, Rest, Gui };
 
-    public Config(String[] args)
+    class Config
     {
-        appType = AppType.Console;
-        for (int i = 0; i < args.Length; i++) {
-            if (args[i] == "--console")
-            {
-                appType = AppType.Console;
-            }
-            if (args[i] == "--rest")
-            {
-                appType = AppType.Rest;
-            }
-            if (args[i] == "--gui")
-            {
-                appType = AppType.Gui;
+        public AppType AppType { get; private set; }
+
+        public Config(String[] args)
+        {
+            AppType = AppType.Console;
+            for (int i = 0; i < args.Length; i++) {
+                if (args[i] == "--console")
+                {
+                    AppType = AppType.Console;
+                }
+                if (args[i] == "--rest")
+                {
+                    AppType = AppType.Rest;
+                }
+                if (args[i] == "--gui")
+                {
+                    AppType = AppType.Gui;
+                }
             }
         }
-    }
+    }   
 }
+
 

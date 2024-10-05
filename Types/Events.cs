@@ -1,24 +1,26 @@
-using System.Dynamic;
-
-class Event {
-    public int id { get; private set; }
-}
-
-class AddTaskEvent : Event
+namespace Types
 {
-    public Task task { get; private set; }
+    class Event {
+        public int Id { get; private set; }
+    }
+
+    class AddTaskEvent : Event
+    {
+        public Task Task { get; private set; }
+    }
+
+    class SearchTagsEvent : Event
+    {
+        public List<string> Tags { get; private set; }
+    }
+
+    class LastTasksEvent : Event
+    {
+        public int Amount { get; private set; }
+    }
+
+    class ExitEvent : Event
+    {
+    }
 }
 
-class SearchTagsEvent : Event
-{
-    public List<String> tags { get; private set; }
-}
-
-class LastTasksEvent : Event
-{
-    public int amount { get; private set; }
-}
-
-class ExitEvent : Event
-{
-}

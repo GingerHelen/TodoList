@@ -1,16 +1,19 @@
-
-class Task
+namespace Types
 {
-    public String title { get; private set; }
-    public String description { get; private set; }
-    public DateTime deadline { get; private set; }
-    public List<String> tags { get; private set; }
-
-    public Task(String title, String description, DateTime deadline, List<String> tags)
+    public class Task
     {
-        this.title = title;
-        this.description = description;
-        this.deadline = deadline;
-        this.tags = tags;
+        public string Title { get; private set; }
+        public string Description { get; private set; }
+        public DateTime Deadline { get; private set; }
+        public List<string> Tags { get; private set; }
+
+        public Task(string title, string description, DateTime deadline, List<string> tags)
+        {
+            Title = title;
+            Description = description;
+            Deadline = deadline;
+            Tags = tags;
+        }
     }
 }
+
