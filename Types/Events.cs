@@ -1,26 +1,48 @@
-namespace Types
+namespace Types;
+
+public abstract class Event {
+    public int Id { get; protected set; }
+}
+
+public class AddTaskEvent : Event
 {
-    class Event {
-        public int Id { get; private set; }
-    }
+    public TaskToDo Task { get; private set; }
 
-    class AddTaskEvent : Event
+    public AddTaskEvent(TaskToDo taskToDo)
     {
-        public Task Task { get; private set; }
-    }
-
-    class SearchTagsEvent : Event
-    {
-        public List<string> Tags { get; private set; }
-    }
-
-    class LastTasksEvent : Event
-    {
-        public int Amount { get; private set; }
-    }
-
-    class ExitEvent : Event
-    {
+        Task = taskToDo;
+        Id = 1;
     }
 }
+
+public class SearchTagsEvent : Event
+{
+    public List<string> Tags { get; private set; }
+
+    public SearchTagsEvent(List<string> tags)
+    {
+        Tags = tags;
+        Id = 2;
+    }
+}
+
+public class LastTasksEvent : Event
+{
+    public int Amount { get; private set; }
+
+    public LastTasksEvent(int amount)
+    {
+        Amount = amount;
+        Id = 3;
+    }
+}
+
+public class ExitEvent : Event
+{
+    public ExitEvent()
+    {
+        Id = 4;
+    }
+}
+
 
