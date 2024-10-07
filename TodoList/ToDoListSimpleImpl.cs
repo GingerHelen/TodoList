@@ -1,55 +1,57 @@
 
-namespace TodoList
-{   
-    using Types;
-    public class ToDoListSimpleImpl : IToDoList
+namespace TodoList;
+
+using Types;
+public class ToDoListSimpleImpl : IToDoList
+{
+    private SortedDictionary<string, TaskToDo> Tasks;
+
+    public ToDoListSimpleImpl()
     {
-        private SortedDictionary<string, Task> Tasks;
-
-        public ToDoListSimpleImpl()
-        {
-            Tasks = new SortedDictionary<string, Task>();
-        }
-
-        public void AddTask(Task task)
-        {
-            Tasks.Add(task.Title, task);
-        }
-
-        public List<Task> SearchTasksByTags(List<string> tags)
-        {
-            List<Task> result = new List<Task>();
-            foreach (var pair in Tasks)
-            {
-                for (int i = 0; i < tags.Count; i++)
-                {
-                    if (pair.Value.Tags.Contains(tags[i]))
-                    {
-                        result.Add(pair.Value);
-                        break;
-                    } 
-                }
-            }
-            return result;
-        }
-
-        public bool RemoveByTitle(string title)
-        {
-            return Tasks.Remove(title);
-        }
-
-        public List<Task> LastTasks(int n)
-        { 
-         List<Task> result = new List<Task>();
-          
-        }
-
-        public void Clear()
-        {
-          Tasks.Clear();  
-        }
-
+        Tasks = new SortedDictionary<string, TaskToDo>();
     }
+
+    public void AddTask(TaskToDo taskToDo)
+    {
+        Tasks.Add(taskToDo.Title, taskToDo);
+    }
+
+    public List<TaskToDo> SearchTasksByTags(List<string> tags)
+    {
+        List<TaskToDo> result = new List<TaskToDo>();
+        foreach (var pair in Tasks)
+        {
+            foreach (var tag in tags)
+            {
+                if (pair.Value.Tags.Contains(tag))
+                {
+                    result.Add(pair.Value);
+                    break;
+                } 
+            }
+        }
+        return result;
+    }
+
+    public bool RemoveByTitle(string title)
+    {
+        return Tasks.Remove(title);
+    }
+
+    public List<TaskToDo> LastTasks(int n)
+    { 
+        List<TaskToDo> result = new List<TaskToDo>();
+        foreach (var pair in Tasks) { 
+            result.Add(pair.Value);
+        }
+        return result.OrderBy(x => x.Deadline).Take(n).ToList();
+    }
+
+    public void Clear()
+    {
+      Tasks.Clear();  
+    }
+
 }
 
 
