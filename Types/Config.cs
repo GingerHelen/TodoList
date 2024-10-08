@@ -10,17 +10,21 @@ public class Config
     {
         AppType = AppType.Console;
         for (int i = 0; i < args.Length; i++) {
-            if (args[i] == "--console")
+            if (args[i].Equals("--console"))
             {
                 AppType = AppType.Console;
             }
-            if (args[i] == "--rest")
+            if (args[i].Equals("--rest"))
             {
                 AppType = AppType.Rest;
             }
-            if (args[i] == "--gui")
+            if (args[i].Equals("--gui"))
             {
                 AppType = AppType.Gui;
+            }
+            else
+            {
+                throw new ArgumentException("Wrong argument: " + args[i]);
             }
         }
     }

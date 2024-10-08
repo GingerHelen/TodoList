@@ -11,16 +11,15 @@ public class MainApplication
         var appConfig = new Config(args);
         
         IToDoList todoList = CreateTodoList(appConfig);
-        App app = CreateApp(appConfig);
-        
-        // Start application
+        IApp app = CreateApp(appConfig);
+        app.SetConfig(appConfig);
         app.StartApp(todoList);
     }
 
-    static App CreateApp(Config config)
+    static IApp CreateApp(Config config)
     {
         if (config.AppType == AppType.Console)
-        {
+       {
             return new ConsoleApp();
         }
         else

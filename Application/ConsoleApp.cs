@@ -16,7 +16,7 @@ class WrongArgumentException : Exception
 {
     
 }
-public class ConsoleApp : App
+public class ConsoleApp : IApp
 {
 
     private IToDoList _toDoList;
@@ -100,7 +100,9 @@ public class ConsoleApp : App
         }
         else
         {
+            Console.WriteLine("Wrong option");
             throw new WrongOptionException();
+            
         }
     }
 
@@ -141,8 +143,14 @@ public class ConsoleApp : App
         if (@event is AddTaskEvent)
         {
             var addTaskEvent = (AddTaskEvent)@event;
-            _toDoList.AddTask(addTaskEvent.Task);
-            Console.WriteLine("Task was successfully added!");
+            if (_toDoList.AddTask(addTaskEvent.Task))
+            {
+                Console.WriteLine("Task was successfully added!");
+            }
+            else
+            {
+                Console.WriteLine("Cannot add task: this title exist already");
+            }
         } else  
         if (@event is SearchTagsEvent)
         {
@@ -166,9 +174,15 @@ public class ConsoleApp : App
         {
             var lastTasksEvent = (LastTasksEvent)@event;
             var tasks = _toDoList.LastTasks(lastTasksEvent.Amount);
-            foreach (var task in tasks)
+            if (tasks.Count != 0) 
+            {
+                foreach (var task in tasks)
             {
                 PrintTask(task);
+            }}
+            else
+            {
+                Console.WriteLine("There are no tasks in the list, you can add some tasks:)");
             }
 
         } else 
@@ -185,6 +199,9 @@ public class ConsoleApp : App
         Console.WriteLine("Title: " + task.Title);
         Console.WriteLine("Description: " + task.Description);
         Console.WriteLine("Deadline: " + task.Deadline.Date);
-        Console.WriteLine("Tags: " + task.Tags);
+        Console.WriteLine("Tags: ");
+        for (int i = 0; i < task.Tags.Count; i++) {
+            Console.WriteLine(task.Tags[i] + " ");
+        }
     }
 }

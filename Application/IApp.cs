@@ -2,7 +2,7 @@ namespace Application;
 using Types;
 using TodoList;
 
-public interface App
+public interface IApp
 {
     void StartApp(IToDoList todoList);
 

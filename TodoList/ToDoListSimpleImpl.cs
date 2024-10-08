@@ -11,9 +11,14 @@ public class ToDoListSimpleImpl : IToDoList
         Tasks = new SortedDictionary<string, TaskToDo>();
     }
 
-    public void AddTask(TaskToDo taskToDo)
+    public bool AddTask(TaskToDo taskToDo)
     {
+        if (Tasks.ContainsKey(taskToDo.Title))
+        {
+            return false;
+        }
         Tasks.Add(taskToDo.Title, taskToDo);
+        return true;
     }
 
     public List<TaskToDo> SearchTasksByTags(List<string> tags)
