@@ -13,7 +13,11 @@ public class TodoListSimpleImplTest
     [SetUp]
     public void Setup()
     {
-        todoList = new ToDoListSimpleImpl();
+        using (StreamWriter outputFile = new StreamWriter("todolisttest.json", false))
+        {
+            outputFile.Write(string.Empty);
+        }
+        todoList = new ToDoListSimpleImpl("todolisttest.json");
     }
 
     [Test]

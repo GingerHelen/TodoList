@@ -1,14 +1,54 @@
 
+using Newtonsoft.Json;
+
 namespace TodoList;
 
 using Types;
 public class ToDoListSimpleImpl : IToDoList
 {
     private SortedDictionary<string, TaskToDo> Tasks;
+    private string _path;
 
-    public ToDoListSimpleImpl()
+    public ToDoListSimpleImpl(string path)
     {
+        _path = path;
         Tasks = new SortedDictionary<string, TaskToDo>();
+        if (!Path.Exists(_path))
+        {
+            using (File.Create(_path)){}
+        }
+        FetchTasks();
+    }
+
+    private void FetchTasks()
+    {
+        using (StreamReader r = new StreamReader(_path))
+        {
+            string json = r.ReadToEnd();
+            List<TaskToDo>? tasks = JsonConvert.DeserializeObject<List<TaskToDo>>(json);
+            Tasks.Clear();
+            if (tasks != null)
+            {
+                foreach (var task in tasks)
+                {
+                    Tasks.Add(task.Title, task);
+                }
+            }
+        }
+    }
+
+    private void UpdateTasks()
+    {
+        List<TaskToDo> tasks = new List<TaskToDo>();
+        foreach (var pair in Tasks)
+        {
+            tasks.Add(pair.Value);
+        }
+        string json = JsonConvert.SerializeObject(tasks, Formatting.Indented);
+        using (StreamWriter outputFile = new StreamWriter(_path, false))
+        {
+            outputFile.Write(json);
+        }
     }
 
     public bool AddTask(TaskToDo taskToDo)
@@ -18,6 +58,7 @@ public class ToDoListSimpleImpl : IToDoList
             return false;
         }
         Tasks.Add(taskToDo.Title, taskToDo);
+        UpdateTasks();
         return true;
     }
 
@@ -40,7 +81,9 @@ public class ToDoListSimpleImpl : IToDoList
 
     public bool RemoveByTitle(string title)
     {
-        return Tasks.Remove(title);
+        bool res = Tasks.Remove(title);
+        UpdateTasks();
+        return res;
     }
 
     public List<TaskToDo> LastTasks(int n)
@@ -54,7 +97,8 @@ public class ToDoListSimpleImpl : IToDoList
 
     public void Clear()
     {
-      Tasks.Clear();  
+      Tasks.Clear(); 
+      UpdateTasks();
     }
 
 }

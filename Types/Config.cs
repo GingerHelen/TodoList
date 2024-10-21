@@ -5,7 +5,7 @@ public enum AppType { Console, Rest, Gui };
 public class Config
 {
     public AppType AppType { get; private set; }
-
+    public string Path { get; private set; } = "todolist.json";
     public Config(string[] args)
     {
         AppType = AppType.Console;

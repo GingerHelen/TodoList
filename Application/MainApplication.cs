@@ -30,6 +30,6 @@ public class MainApplication
     
     static IToDoList CreateTodoList(Config config)
     {
-        return new ToDoListSimpleImpl();
+        return new ToDoListSimpleImpl(config.Path);
     }
 }
