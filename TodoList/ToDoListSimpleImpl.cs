@@ -51,18 +51,18 @@ public class ToDoListSimpleImpl : IToDoList
         }
     }
 
-    public bool AddTask(TaskToDo taskToDo)
+    public Task<bool> AddTask(TaskToDo taskToDo)
     {
         if (Tasks.ContainsKey(taskToDo.Title))
         {
-            return false;
+            return Task.FromResult(false);
         }
         Tasks.Add(taskToDo.Title, taskToDo);
         UpdateTasks();
-        return true;
+        return Task.FromResult(true);
     }
 
-    public List<TaskToDo> SearchTasksByTags(List<string> tags)
+    public Task<List<TaskToDo>> SearchTasksByTags(List<string> tags)
     {
         List<TaskToDo> result = new List<TaskToDo>();
         foreach (var pair in Tasks)
@@ -76,29 +76,30 @@ public class ToDoListSimpleImpl : IToDoList
                 } 
             }
         }
-        return result;
+        return Task.FromResult(result);
     }
 
-    public bool RemoveByTitle(string title)
+    public Task<bool> RemoveByTitle(string title)
     {
         bool res = Tasks.Remove(title);
         UpdateTasks();
-        return res;
+        return Task.FromResult(res);
     }
 
-    public List<TaskToDo> LastTasks(int n)
+    public Task<List<TaskToDo>> LastTasks(int n)
     { 
         List<TaskToDo> result = new List<TaskToDo>();
         foreach (var pair in Tasks) { 
             result.Add(pair.Value);
         }
-        return result.OrderBy(x => x.Deadline).Take(n).ToList();
+        return Task.FromResult(result.OrderBy(x => x.Deadline).Take(n).ToList());
     }
 
-    public void Clear()
+    public Task Clear()
     {
       Tasks.Clear(); 
       UpdateTasks();
+      return Task.CompletedTask;
     }
 
 }

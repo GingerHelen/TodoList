@@ -159,7 +159,7 @@ public class ConsoleApp : IApp
         if (@event is AddTaskEvent)
         {
             var addTaskEvent = (AddTaskEvent)@event;
-            if (_toDoList.AddTask(addTaskEvent.Task))
+            if (_toDoList.AddTask(addTaskEvent.Task).Result)
             {
                 Console.WriteLine("Task was successfully added!");
             }
@@ -171,7 +171,7 @@ public class ConsoleApp : IApp
         else if (@event is SearchTagsEvent)
         {
             var searchTagsEvent = (SearchTagsEvent)@event;
-            var resultOfSearch = _toDoList.SearchTasksByTags(searchTagsEvent.Tags);
+            var resultOfSearch = _toDoList.SearchTasksByTags(searchTagsEvent.Tags).Result;
             if (resultOfSearch.Count > 0)
             {
                 Console.WriteLine("Found tasks:");
@@ -188,7 +188,7 @@ public class ConsoleApp : IApp
         else if (@event is LastTasksEvent)
         {
             var lastTasksEvent = (LastTasksEvent)@event;
-            var tasks = _toDoList.LastTasks(lastTasksEvent.Amount);
+            var tasks = _toDoList.LastTasks(lastTasksEvent.Amount).Result;
             if (tasks.Count != 0)
             {
                 foreach (var task in tasks)
