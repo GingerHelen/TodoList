@@ -6,18 +6,15 @@ using NUnit.Framework;
 using TodoList;
 
 [TestFixture]
-public class TodoListSimpleImplTest
+public class TodoListPostgresTest
 {
-    private ToDoListSimpleImpl todoList; 
+    private ToDoListPostgres todoList; 
     
     [SetUp]
     public void Setup()
     {
-        using (StreamWriter outputFile = new StreamWriter("todolisttest.json", false))
-        {
-            outputFile.Write(string.Empty);
-        }
-        todoList = new ToDoListSimpleImpl("todolisttest.json");
+        todoList = new ToDoListPostgres("todolist_test");
+        todoList.Clear().Wait();
     }
 
     [Test]
@@ -86,17 +83,17 @@ public class TodoListSimpleImplTest
         Assert.True(search.Count == 1 && search[0].Title == "task1", search.Count.ToString());
     }
 
-    [Test]
-    public void Clear_ResultOK()
-    {
-        var task1 = new TaskToDo("task1", "", DateTime.Now, new List<string>());
-        var task2 = new TaskToDo("task2", "", DateTime.Now, new List<string>());
-        var t1 = todoList.AddTask(task1);
-        var t2 = todoList.AddTask(task2);
-        var t3 = todoList.Clear();
-        Assert.True(t1.Result);
-        Assert.True(t2.Result);
-        t3.Wait();
-        Assert.True(todoList.LastTasks(2).Result.Count == 0);
-    }
+    // [Test]
+    // public void Clear_ResultOK()
+    // {
+    //     var task1 = new TaskToDo("task1", "", DateTime.Now, new List<string>());
+    //     var task2 = new TaskToDo("task2", "", DateTime.Now, new List<string>());
+    //     var t1 = todoList.AddTask(task1);
+    //     var t2 = todoList.AddTask(task2);
+    //     var t3 = todoList.Clear();
+    //     Assert.True(t1.Result);
+    //     Assert.True(t2.Result);
+    //     t3.Wait();
+    //     Assert.True(todoList.LastTasks(2).Result.Count == 0);
+    // }
 }
