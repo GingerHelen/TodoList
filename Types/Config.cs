@@ -7,7 +7,7 @@ public enum DbType { Json, Sql };
 
 public class Config
 {
-    public AppType AppType { get; private set; }
+    public AppType AppType { get; private set; } = AppType.Console;
     public string Path { get; private set; } = "todolist.json";
     public string DbName { get; private set; } = "todolist";
     public DbType DbType { get; private set; } = DbType.Json;

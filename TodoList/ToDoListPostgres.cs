@@ -1,5 +1,3 @@
-using System.Data;
-
 namespace TodoList;
 
 using Npgsql;
@@ -8,7 +6,7 @@ using Types;
 public class ToDoListPostgres : IToDoList
 {
     private string psqlURI = "Host=localhost;Port=5432;Username=postgres;Password=postgres";
-    // private NpgsqlConnection psqlConnection;
+    
 
     public ToDoListPostgres(string dbname)
     {
@@ -16,17 +14,24 @@ public class ToDoListPostgres : IToDoList
         using (var psqlConnection = new NpgsqlConnection(psqlURI))
         {
             psqlConnection.Open();
-            try
-            {
-                CreateToDoList(psqlConnection);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                psqlConnection.Close();
-                throw e;
-            }
+            CreateToDoList(psqlConnection);
         }
+    }
+    
+    private static async Task<List<TaskToDo>> ReadTasks(NpgsqlDataReader reader)
+    {
+        var list = new List<TaskToDo>();
+        while (await reader.ReadAsync())
+        {
+            list.Add(new TaskToDo(
+                reader.GetString(0),
+                reader.GetString(1),
+                reader.GetDateTime(2),
+                new List<string>(reader.GetFieldValue<string[]>(3))
+            ));
+        }
+
+        return list;
     }
     
     private static string TagsToString(List<string> tags)
@@ -54,8 +59,6 @@ public class ToDoListPostgres : IToDoList
                 Deadline DATE NOT NULL,
                 Tags TEXT[]
             );
-            CREATE INDEX IF NOT EXISTS todolist_tags_index ON ToDoList USING gin (Tags);
-            CREATE INDEX IF NOT EXISTS todolist_deadline_index ON ToDoList USING btree (Deadline);
         ";
         using (var createCommand = new NpgsqlCommand(createToDoListQuery, psqlConnection))
         {
@@ -67,7 +70,7 @@ public class ToDoListPostgres : IToDoList
     {
         using (var psqlConnection = new NpgsqlConnection(psqlURI))
         {
-            psqlConnection.Open();
+            psqlConnection.Open(); 
             var addTaskQuery =
                 string.Format("INSERT INTO ToDoList VALUES ('{0}', '{1}', '{2}', '{3}')"
                     , taskToDo.Title
@@ -75,7 +78,7 @@ public class ToDoListPostgres : IToDoList
                     , taskToDo.Deadline
                     , TagsToString(taskToDo.Tags));
             var res = await new NpgsqlCommand(addTaskQuery, psqlConnection).ExecuteNonQueryAsync();
-            return res > -1;
+            return res > 0;
         }
     }
 
@@ -84,21 +87,11 @@ public class ToDoListPostgres : IToDoList
         using (var psqlConnection = new NpgsqlConnection(psqlURI))
         {
             psqlConnection.Open();
-            var list = new List<TaskToDo>();
             var searchTasksByTagsQuery =
                 string.Format("SELECT * FROM ToDoList WHERE Tags && '{0}'"
                     , TagsToString(tags));
             var reader = await new NpgsqlCommand(searchTasksByTagsQuery, psqlConnection).ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                list.Add(new TaskToDo(
-                    reader.GetString(0),
-                    reader.GetString(1),
-                    reader.GetDateTime(2),
-                    new List<string>(reader.GetFieldValue<string[]>(3))
-                ));
-            }
-            return list;
+            return ReadTasks(reader).Result;
         }
     }
 
@@ -110,7 +103,7 @@ public class ToDoListPostgres : IToDoList
             var removeByTitleQuery =
                 string.Format("DELETE FROM ToDoList WHERE Title = '{0}'", title);
             var res = await new NpgsqlCommand(removeByTitleQuery, psqlConnection).ExecuteNonQueryAsync();
-            return res > -1;
+            return res > 0;
         }
     }
 
@@ -119,20 +112,10 @@ public class ToDoListPostgres : IToDoList
         using (var psqlConnection = new NpgsqlConnection(psqlURI))
         {
             psqlConnection.Open();
-            var list = new List<TaskToDo>();
             var searchTasksByTagsQuery =
                 string.Format("SELECT * FROM ToDoList ORDER BY Deadline LIMIT {0}", n);
             var reader = await new NpgsqlCommand(searchTasksByTagsQuery, psqlConnection).ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                list.Add(new TaskToDo(
-                    reader.GetString(0),
-                    reader.GetString(1),
-                    reader.GetDateTime(2),
-                    new List<string>(reader.GetFieldValue<string[]>(3))
-                ));
-            }
-            return list;
+            return ReadTasks(reader).Result;
         }
     }
 
@@ -141,8 +124,8 @@ public class ToDoListPostgres : IToDoList
         using (var psqlConnection = new NpgsqlConnection(psqlURI))
         {
             psqlConnection.Open();
-            var clearQuery = string.Format("DELETE FROM ToDoList");
-            var res = await new NpgsqlCommand(clearQuery, psqlConnection).ExecuteNonQueryAsync();
+            var clearQuery = "DELETE FROM ToDoList";
+            await new NpgsqlCommand(clearQuery, psqlConnection).ExecuteNonQueryAsync();
         }
     }
 }
