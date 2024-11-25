@@ -25,10 +25,10 @@ public class ToDoListPostgres : IToDoList
     public ToDoListPostgres(string dbname)
     {
         psqlURI += $";Database={dbname}";
-        using (IDbConnection psqlConnection = CreateConnectionToDb())
+        using (IDbConnection connection = CreateConnectionToDb())
         {
-            psqlConnection.Open();
-            CreateToDoList(psqlConnection);
+            connection.Open();
+            CreateToDoList(connection);
         }
     }
     
