@@ -1,37 +1,35 @@
+using System.Data;
+
 namespace TodoList;
 
 using Npgsql;
+using Dapper;  
 using Types;
 
 public class ToDoListPostgres : IToDoList
 {
     private string psqlURI = "Host=localhost;Port=5432;Username=postgres;Password=postgres";
+
+    private class SqlTaskToDo {
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public DateTime Deadline { get; set; }
+        public string[] Tags { get; set; }
+    }
     
+    IDbConnection CreateConnectionToDb()
+    {
+        return new NpgsqlConnection(psqlURI);
+    }
 
     public ToDoListPostgres(string dbname)
     {
         psqlURI += $";Database={dbname}";
-        using (var psqlConnection = new NpgsqlConnection(psqlURI))
+        using (IDbConnection psqlConnection = CreateConnectionToDb())
         {
             psqlConnection.Open();
             CreateToDoList(psqlConnection);
         }
-    }
-    
-    private static async Task<List<TaskToDo>> ReadTasks(NpgsqlDataReader reader)
-    {
-        var list = new List<TaskToDo>();
-        while (await reader.ReadAsync())
-        {
-            list.Add(new TaskToDo(
-                reader.GetString(0),
-                reader.GetString(1),
-                reader.GetDateTime(2),
-                new List<string>(reader.GetFieldValue<string[]>(3))
-            ));
-        }
-
-        return list;
     }
     
     private static string TagsToString(List<string> tags)
@@ -50,7 +48,7 @@ public class ToDoListPostgres : IToDoList
         return stags;
     }
 
-    private void CreateToDoList(NpgsqlConnection psqlConnection)
+    private void CreateToDoList(IDbConnection connection)
     {
         string createToDoListQuery = @"
             CREATE TABLE IF NOT EXISTS ToDoList (
@@ -60,72 +58,86 @@ public class ToDoListPostgres : IToDoList
                 Tags TEXT[]
             );
         ";
-        using (var createCommand = new NpgsqlCommand(createToDoListQuery, psqlConnection))
-        {
-            createCommand.ExecuteNonQuery();
-        }
+        connection.Execute(createToDoListQuery);
     }
 
     public async Task<bool> AddTask(TaskToDo taskToDo)
     {
-        using (var psqlConnection = new NpgsqlConnection(psqlURI))
+        using (var connection = CreateConnectionToDb())
         {
-            psqlConnection.Open(); 
+            connection.Open();
             var addTaskQuery =
                 string.Format("INSERT INTO ToDoList VALUES ('{0}', '{1}', '{2}', '{3}')"
                     , taskToDo.Title
                     , taskToDo.Description
                     , taskToDo.Deadline
                     , TagsToString(taskToDo.Tags));
-            var res = await new NpgsqlCommand(addTaskQuery, psqlConnection).ExecuteNonQueryAsync();
+            var res = await connection.ExecuteAsync(addTaskQuery);
             return res > 0;
         }
     }
 
     public async Task<List<TaskToDo>> SearchTasksByTags(List<string> tags)
     {
-        using (var psqlConnection = new NpgsqlConnection(psqlURI))
+        using (var connection = CreateConnectionToDb())
         {
-            psqlConnection.Open();
+            connection.Open();
             var searchTasksByTagsQuery =
-                string.Format("SELECT * FROM ToDoList WHERE Tags && '{0}'"
+                string.Format(
+                    @"SELECT Title, Description, Deadline, Tags 
+                      FROM ToDoList 
+                      WHERE Tags && '{0}'"
                     , TagsToString(tags));
-            var reader = await new NpgsqlCommand(searchTasksByTagsQuery, psqlConnection).ExecuteReaderAsync();
-            return ReadTasks(reader).Result;
+            return (await connection.QueryAsync<SqlTaskToDo>(searchTasksByTagsQuery))
+                .Select(stask => new TaskToDo(
+                    stask.Title,
+                    stask.Description,
+                    stask.Deadline,
+                    new List<string>(stask.Tags))
+                ).ToList();
         }
     }
 
     public async Task<bool> RemoveByTitle(string title)
     {
-        using (var psqlConnection = new NpgsqlConnection(psqlURI))
+        using (var connection = CreateConnectionToDb())
         {
-            psqlConnection.Open();
+            connection.Open();
             var removeByTitleQuery =
                 string.Format("DELETE FROM ToDoList WHERE Title = '{0}'", title);
-            var res = await new NpgsqlCommand(removeByTitleQuery, psqlConnection).ExecuteNonQueryAsync();
+            var res = await connection.ExecuteAsync(removeByTitleQuery);
             return res > 0;
         }
     }
 
     public async Task<List<TaskToDo>> LastTasks(int n)
     {
-        using (var psqlConnection = new NpgsqlConnection(psqlURI))
+        using (var connection = CreateConnectionToDb())
         {
-            psqlConnection.Open();
-            var searchTasksByTagsQuery =
-                string.Format("SELECT * FROM ToDoList ORDER BY Deadline LIMIT {0}", n);
-            var reader = await new NpgsqlCommand(searchTasksByTagsQuery, psqlConnection).ExecuteReaderAsync();
-            return ReadTasks(reader).Result;
+            connection.Open();
+            var searchTasksQuery =
+                string.Format(
+                    @"SELECT Title, Description, Deadline, Tags 
+                      FROM ToDoList 
+                      ORDER BY Deadline LIMIT {0}"
+                    , n);
+            return (await connection.QueryAsync<SqlTaskToDo>(searchTasksQuery))
+                .Select(stask => new TaskToDo(
+                    stask.Title,
+                    stask.Description,
+                    stask.Deadline,
+                    new List<string>(stask.Tags))
+                ).ToList();
         }
     }
 
     public async Task Clear()
     {
-        using (var psqlConnection = new NpgsqlConnection(psqlURI))
+        using (var connection = CreateConnectionToDb())
         {
-            psqlConnection.Open();
+            connection.Open();
             var clearQuery = "DELETE FROM ToDoList";
-            await new NpgsqlCommand(clearQuery, psqlConnection).ExecuteNonQueryAsync();
+            await connection.ExecuteAsync(clearQuery);
         }
     }
 }
