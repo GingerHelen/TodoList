@@ -1,8 +1,10 @@
 using TodoList;
 using Types;
-using Fclp;
+using App;
+using App.ConsoleApp;
+using App.Rest;
 
-namespace Application;
+namespace MainApp;
 
 public class MainApplication
 {
@@ -27,6 +29,10 @@ public class MainApplication
         if (config.AppType == AppType.Console)
        {
             return new ConsoleApp();
+        }
+        else if (config.AppType == AppType.Rest)
+        {
+            return new RestWebApp();
         }
         else
         {

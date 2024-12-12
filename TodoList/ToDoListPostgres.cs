@@ -127,7 +127,7 @@ public class ToDoListPostgres : IToDoList
                     stask.Description,
                     stask.Deadline,
                     new List<string>(stask.Tags))
-                ).ToList();
+                ).ToList(); 
         }
     }
 

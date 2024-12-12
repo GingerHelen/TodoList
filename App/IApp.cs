@@ -1,4 +1,4 @@
-namespace Application;
+namespace App;
 using Types;
 using TodoList;
 

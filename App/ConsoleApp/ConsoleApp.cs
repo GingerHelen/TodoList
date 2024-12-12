@@ -1,6 +1,6 @@
 using Console = System.Console;
 
-namespace Application;
+namespace App.ConsoleApp;
 
 using Types;
 using TodoList;
