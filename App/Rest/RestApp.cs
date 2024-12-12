@@ -3,6 +3,8 @@ using Types;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 namespace App.Rest;
 
@@ -41,13 +43,29 @@ public class RestWebApp : IApp
             Environment.Exit(0);
         }).WithName("Exit").WithOpenApi();
         
-        // app.MapPost("/add_task", () =>
-        // {
-        //     if (title == null || description == null || deadline == null || )
-        //     {
-        //         return Results.BadRequest();
-        //     }
-        // }).WithName("Exit").WithOpenApi();
+        app.MapPost("/add_task", ([FromBody] TaskToDo? task) =>
+        {
+            if (task == null)
+            {
+                return Results.BadRequest();
+            }
+
+            todoList.AddTask(task);
+
+            return Results.Ok();
+        }).WithName("Add task").WithOpenApi();
+        
+        app.MapGet("/search_task", ([FromBody] List<string>? tags) =>
+        {
+            if (tags == null)
+            {
+                return Results.BadRequest();
+            }
+
+            var res = todoList.SearchTasksByTags(tags).Result;
+            
+            return Results.Ok(res);
+        }).WithName("Search task").WithOpenApi();
         
         app.Run();
     }
