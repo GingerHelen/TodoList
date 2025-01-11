@@ -1,21 +1,12 @@
 using TodoList;
 using Types;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 namespace App.Rest;
 
 public class RestWebApp : IApp
 {
-    private int port;
-    public void SetConfig(Config config)
-    {
-        port = config.HttpPort;
-    }
-
     public void StartApp(IToDoList todoList)
     {
         var builder = WebApplication.CreateBuilder();
@@ -31,7 +22,7 @@ public class RestWebApp : IApp
         app.MapGet("/last_tasks", (int? n) =>
         {
             var tasks = todoList.LastTasks(n ?? 5).Result;
-            return Results.Json(new {
+            return Results.Ok(new {
                 amount = tasks.Count,
                 tasks
             });
@@ -43,7 +34,7 @@ public class RestWebApp : IApp
             Environment.Exit(0);
         }).WithName("Exit").WithOpenApi();
         
-        app.MapPost("/add_task", ([FromBody] TaskToDo? task) =>
+        app.MapPost("/add_task", (TaskToDo? task) =>
         {
             if (task == null)
             {
@@ -55,7 +46,7 @@ public class RestWebApp : IApp
             return Results.Ok();
         }).WithName("Add task").WithOpenApi();
         
-        app.MapGet("/search_task", ([FromBody] List<string>? tags) =>
+        app.MapPost("/search_task", (List<string>? tags) =>
         {
             if (tags == null)
             {
