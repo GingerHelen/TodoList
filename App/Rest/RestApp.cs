@@ -28,10 +28,11 @@ public class RestWebApp : IApp
             });
         }).WithName("Last tasks").WithOpenApi();
         
-        app.MapPost("/exit", () =>
+        app.MapGet("/exit", () =>
         {
             Console.WriteLine("Exited successfully");
-            Environment.Exit(0);
+            app.StopAsync();
+            return Results.Ok();
         }).WithName("Exit").WithOpenApi();
         
         app.MapPost("/add_task", (TaskToDo? task) =>
