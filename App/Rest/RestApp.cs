@@ -3,6 +3,7 @@ using Types;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Mvc;
 namespace App.Rest;
 
 public class RestWebApp : IApp
@@ -35,26 +36,31 @@ public class RestWebApp : IApp
             return Results.Ok();
         }).WithName("Exit").WithOpenApi();
         
-        app.MapPost("/add_task", (TaskToDo? task) =>
+        app.MapGet("/add_task", (string? title, string? description, DateTime? deadline, string[]? tags) =>
         {
-            if (task == null)
+            if (title == null || description == null || deadline == null || tags == null)
             {
                 return Results.BadRequest();
             }
 
-            todoList.AddTask(task);
+            todoList.AddTask(new TaskToDo(
+                title,
+                description,
+                deadline.Value,
+                new List<string>(tags)
+                ));
 
             return Results.Ok();
         }).WithName("Add task").WithOpenApi();
         
-        app.MapPost("/search_task", (List<string>? tags) =>
+        app.MapGet("/search_task", (string[]? tags) =>
         {
             if (tags == null)
             {
                 return Results.BadRequest();
             }
 
-            var res = todoList.SearchTasksByTags(tags).Result;
+            var res = todoList.SearchTasksByTags(new List<string>(tags)).Result;
             
             return Results.Ok(res);
         }).WithName("Search task").WithOpenApi();
