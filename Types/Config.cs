@@ -11,7 +11,6 @@ public class Config
     public string Path { get; private set; } = "todolist.json";
     public string DbName { get; private set; } = "todolist";
     public DbType DbType { get; private set; } = DbType.Json;
-    public int HttpPort { get; private set; } = 5432;
 
     public Config(string[] args)
     {
@@ -39,9 +38,6 @@ public class Config
         parser.Setup<bool>(CaseType.CaseSensitive, "sql")
             .Callback(b => DbType = DbType.Sql)
             .WithDescription("Application will use sql database");
-        parser.Setup<int>(CaseType.CaseSensitive, "http-port")
-            .Callback(port => HttpPort = port)
-            .WithDescription("Web application will be use this http port");
         parser.Parse(args);
     }
 }   
