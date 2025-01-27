@@ -9,9 +9,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\App\App.csproj" />
+      <ProjectReference Include="..\GuiApp\GuiApp.csproj" />
       <ProjectReference Include="..\TodoList\TodoList.csproj" />
       <ProjectReference Include="..\Types\Types.csproj" />
+      <ProjectReference Include="..\ConsoleApp\ConsoleApp.csproj" />
+      <ProjectReference Include="..\RestWebApp\RestWebApp.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Avalonia" Version="11.2.3" />
     </ItemGroup>
 
 </Project>

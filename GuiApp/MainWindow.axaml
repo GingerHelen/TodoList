@@ -1,0 +1,123 @@
+<Window
+    x:Class="AvaloniaApp.MainWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="TodoList"
+    Width="800"
+    Height="450"
+    FontFamily="{StaticResource GothicFont}"
+    FontSize="20"
+    Icon="/Assets/todolist.ico">
+
+    <Window.Resources>
+        <DataTemplate x:Key="AddTaskTemplate">
+            <StackPanel Orientation="Vertical" Spacing="20">
+                <StackPanel
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="10">
+                    <TextBlock VerticalAlignment="Center" Text="Title:" />
+                    <TextBox
+                        x:Name="AddTaskTitleTextBox"
+                        Width="300"
+                        VerticalAlignment="Center" />
+                </StackPanel>
+                <StackPanel
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="10">
+                    <TextBlock VerticalAlignment="Center" Text="Deadline:" />
+                    <DatePicker Name="AddTaskDeadlinePicker" VerticalAlignment="Center" />
+                </StackPanel>
+                <StackPanel
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="10">
+                    <TextBlock VerticalAlignment="Center" Text="Tags:" />
+                    <TextBox
+                        Name="AddTaskTagTextBox"
+                        Width="300"
+                        VerticalAlignment="Center"
+                        AcceptsReturn="True" />
+                </StackPanel>
+                <StackPanel
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="10">
+                    <TextBlock VerticalAlignment="Center" Text="Description:" />
+                    <TextBox
+                        Name="AddTaskDescriptionTextBox"
+                        Width="300"
+                        VerticalAlignment="Center"
+                        AcceptsReturn="True" />
+                </StackPanel>
+                <Button
+                    Name="AddTaskButton"
+                    VerticalAlignment="Center"
+                    Content="Add"
+                    Click="AddTaskButtonClick" />
+                <TextBlock
+                    Name="AddTaskErrorBlock"
+                    VerticalAlignment="Center"
+                    Foreground="Red"
+                    Text="" />
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="3*" />
+        </Grid.ColumnDefinitions>
+
+        <!--  Левая часть (покрашена в красный)  -->
+        <Border Grid.Column="0" Background="#90EE90">
+            <StackPanel
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                Spacing="3">
+                <!--  Кнопки  -->
+                <!-- <Button Content="Add Task" HorizontalAlignment="Stretch"/>
+                <Button Content="Last tasks" HorizontalAlignment="Stretch"/>
+                <Button Content="Search Tasks" HorizontalAlignment="Stretch"/>
+                <Button Content="Exit" HorizontalAlignment="Stretch"/>-->
+                <Button
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Click="AddTaskClick"
+                    Content="Add task" />
+                <Button
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Content="Search tasks" />
+                <Button
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Content="Last tasks" />
+                <Button
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Click="ExitClick"
+                    Content="Exit" />
+            </StackPanel>
+        </Border>
+
+        <!--  Вертикальная линия (прямоугольник)  -->
+        <Border
+            Grid.Column="1"
+            Width="2"
+            Background="" />
+
+        <!--  Правая часть (покрашена в синюю)  -->
+        <Border Grid.Column="2" Background="#F5F5DC">
+            <ContentControl
+                x:Name="DataPage"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                ContentTemplate="{StaticResource AddTaskTemplate}"
+                Foreground="Black" />
+        </Border>
+    </Grid>
+</Window>
