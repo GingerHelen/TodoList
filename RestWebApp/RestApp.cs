@@ -8,15 +8,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 namespace App.Rest;
 
-public class RestWebApp : IApp
+public class RestWebApp : AbstractApp
 {
     private int port;
-    public void SetConfig(Config config)
+    public virtual void SetConfig(Config config)
     {
         port = config.HttpPort;
     }
 
-    public void StartApp(IToDoList todoList)
+    public virtual void StartApp()
     {
         var builder = WebApplication.CreateBuilder();
 
@@ -30,7 +30,7 @@ public class RestWebApp : IApp
 
         app.MapGet("/last_tasks", (int? n) =>
         {
-            var tasks = todoList.LastTasks(n ?? 5).Result;
+            var tasks = _todolist.LastTasks(n ?? 5).Result;
             return Results.Json(new {
                 amount = tasks.Count,
                 tasks
@@ -50,7 +50,7 @@ public class RestWebApp : IApp
                 return Results.BadRequest();
             }
 
-            todoList.AddTask(task);
+            _todolist.AddTask(task);
 
             return Results.Ok();
         }).WithName("Add task").WithOpenApi();
@@ -62,7 +62,7 @@ public class RestWebApp : IApp
                 return Results.BadRequest();
             }
 
-            var res = todoList.SearchTasksByTags(tags).Result;
+            var res = this._todolist.SearchTasksByTags(tags).Result;
             
             return Results.Ok(res);
         }).WithName("Search task").WithOpenApi();

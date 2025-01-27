@@ -4,10 +4,9 @@ using TodoList;
 
 public interface IApp
 {
-    void StartApp(IToDoList todoList);
+    void StartApp() {}
 
-    void SetConfig(Config config)
-    {
-    }
+    void SetConfig(Config config) {}
 
+    void SetTodoList(IToDoList todolist);
 }

@@ -6,17 +6,13 @@ using Types;
 
 namespace App.Gui;
 
-public class GuiApp : IApp
+public class GuiApp : AbstractApp
 {
 
     public static void Main(string[] args) {
-
     }
-    
-    public void SetConfig(Config config)
-    {}
 
-    public void StartApp(IToDoList todoList)
+    public virtual void StartApp()
     {
         BuildAvaloniaApp().StartWithClassicDesktopLifetime([]);
     }

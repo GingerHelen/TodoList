@@ -3,7 +3,6 @@ using Console = System.Console;
 namespace App.ConsoleApp;
 
 using Types;
-using TodoList;
 
 class WrongOptionException : Exception
 {
@@ -17,9 +16,8 @@ class WrongArgumentException : Exception
 {
 }
 
-public class ConsoleApp : IApp
+public class ConsoleApp : AbstractApp
 {
-    private IToDoList _toDoList;
     private bool _running;
 
     delegate Event EventGetter();
@@ -132,9 +130,9 @@ public class ConsoleApp : IApp
         return input.Trim();
     }
 
-    public void StartApp(IToDoList todoList)
+    public virtual void StartApp()
     {
-        _toDoList = todoList;
+        Console.WriteLine("Run");
         _running = true;
         while (_running)
         {
@@ -159,7 +157,7 @@ public class ConsoleApp : IApp
         if (@event is AddTaskEvent)
         {
             var addTaskEvent = (AddTaskEvent)@event;
-            if (_toDoList.AddTask(addTaskEvent.Task).Result)
+            if (_todolist.AddTask(addTaskEvent.Task).Result)
             {
                 Console.WriteLine("Task was successfully added!");
             }
@@ -171,7 +169,7 @@ public class ConsoleApp : IApp
         else if (@event is SearchTagsEvent)
         {
             var searchTagsEvent = (SearchTagsEvent)@event;
-            var resultOfSearch = _toDoList.SearchTasksByTags(searchTagsEvent.Tags).Result;
+            var resultOfSearch = _todolist.SearchTasksByTags(searchTagsEvent.Tags).Result;
             if (resultOfSearch.Count > 0)
             {
                 Console.WriteLine("Found tasks:");
@@ -188,7 +186,7 @@ public class ConsoleApp : IApp
         else if (@event is LastTasksEvent)
         {
             var lastTasksEvent = (LastTasksEvent)@event;
-            var tasks = _toDoList.LastTasks(lastTasksEvent.Amount).Result;
+            var tasks = _todolist.LastTasks(lastTasksEvent.Amount).Result;
             if (tasks.Count != 0)
             {
                 foreach (var task in tasks)
